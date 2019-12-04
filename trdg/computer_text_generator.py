@@ -3,10 +3,10 @@ import random as rnd
 from PIL import Image, ImageColor, ImageFont, ImageDraw, ImageFilter
 
 
-def generate(text, font, text_color, font_size, orientation, space_width, character_spacing, fit):
+def generate(text, font, text_color, font_size, orientation, space_width, character_spacing, fit, bold=False):
     if orientation == 0:
         return _generate_horizontal_text(
-            text, font, text_color, font_size, space_width, character_spacing, fit
+            text, font, text_color, font_size, space_width, character_spacing, fit, bold
         )
     elif orientation == 1:
         return _generate_vertical_text(
@@ -16,7 +16,7 @@ def generate(text, font, text_color, font_size, orientation, space_width, charac
         raise ValueError("Unknown orientation " + str(orientation))
 
 
-def _generate_horizontal_text(text, font, text_color, font_size, space_width, character_spacing, fit):
+def _generate_horizontal_text(text, font, text_color, font_size, space_width, character_spacing, fit, bold=False):
     image_font = ImageFont.truetype(font=font, size=font_size)
 
     space_width = int(image_font.getsize(" ")[0] * space_width)
@@ -47,6 +47,14 @@ def _generate_horizontal_text(text, font, text_color, font_size, space_width, ch
             fill=fill,
             font=image_font,
         )
+
+        if bold:
+            txt_draw.text(
+                (sum(char_widths[0:i]) + i * character_spacing + 1, 1),
+                c,
+                fill=fill,
+                font=image_font,
+            )
 
     if fit:
         return txt_img.crop(txt_img.getbbox())

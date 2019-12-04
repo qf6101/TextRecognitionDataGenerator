@@ -50,6 +50,7 @@ class FakeTextDataGenerator(object):
         character_spacing,
         margins,
         fit,
+        bold=False
     ):
         image = None
 
@@ -66,7 +67,7 @@ class FakeTextDataGenerator(object):
             image = handwritten_text_generator.generate(text, text_color)
         else:
             image = computer_text_generator.generate(
-                text, font, text_color, size, orientation, space_width, character_spacing, fit
+                text, font, text_color, size, orientation, space_width, character_spacing, fit, bold
             )
 
         random_angle = rnd.randint(0 - skewing_angle, skewing_angle)
@@ -196,4 +197,4 @@ class FakeTextDataGenerator(object):
         if out_dir is not None:
             final_image.convert("RGB").save(os.path.join(out_dir, image_name))
         else:
-            return final_image.convert("RGB")
+            return final_image.convert("RGB"), background_width, background_height

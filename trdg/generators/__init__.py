@@ -4,3 +4,4 @@ from trdg.generators.from_strings import GeneratorFromStrings
 from trdg.generators.from_wikipedia import (
     GeneratorFromWikipedia,
 )
+from trdg.generators.compound_generator import CompoundGenerator
