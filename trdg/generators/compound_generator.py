@@ -8,14 +8,11 @@ class CompoundGenerator:
 
     def __init__(
             self,
+            conf,
             count=-1,
             language="en",
-            size=32,
-            skewing_angle=0,
-            random_skew=False,
             blur=0,
             random_blur=False,
-            background_type=0,
             distorsion_type=0,
             distorsion_orientation=0,
             is_handwritten=False,
@@ -24,20 +21,22 @@ class CompoundGenerator:
             orientation=0,
             space_width=1.0,
             character_spacing=0,
-            margins=(5, 5, 5, 5),
-            fit=False,
-            line_margin=5,
-            box_skewing_angle=0,
-            box_random_skew=False
+            margins=(5, 5, 5, 5)
     ):
+
+        self.size = conf.size
+        self.skewing_angle = conf.skewing_angle
+        self.random_skew = conf.random_skew
+        self.background_type = conf.background_type
+        self.fit = conf.fit
+        self.line_margin = conf.line_margin
+        self.box_skewing_angle = conf.box_skewing_angle
+        self.box_random_skew = conf.box_random_skew
+
         self.count = count
         self.language = language
-        self.size = size
-        self.skewing_angle = skewing_angle
-        self.random_skew = random_skew
         self.blur = blur
         self.random_blur = random_blur
-        self.background_type = background_type
         self.distorsion_type = distorsion_type
         self.distorsion_orientation = distorsion_orientation
         self.is_handwritten = is_handwritten
@@ -47,11 +46,7 @@ class CompoundGenerator:
         self.space_width = space_width
         self.character_spacing = character_spacing
         self.margins = margins
-        self.fit = fit
         self.generated_count = 0
-        self.line_margin = line_margin
-        self.box_skewing_angle = box_skewing_angle
-        self.box_random_skew = box_random_skew
 
         random.seed()
 
@@ -118,12 +113,12 @@ class CompoundGenerator:
                     (args.box_margins[0], idx * self.size + args.box_margins[1] + img_.height)
                 )
             elif args.alignment == 1:
-                img.paste(img_, ((img.width - img_.width)//2, 0))
-                bkg_ = Image.new("L", ((img.width - img_.width)//2, self.size), 255).convert("RGBA")
+                img.paste(img_, ((img.width - img_.width) // 2, 0))
+                bkg_ = Image.new("L", ((img.width - img_.width) // 2, self.size), 255).convert("RGBA")
                 img.paste(bkg_, (0, 0))
-                img.paste(bkg_, ((img.width + img_.width)//2, 0))
+                img.paste(bkg_, ((img.width + img_.width) // 2, 0))
                 dst.paste(img, (args.box_margins[0], idx * self.size + args.box_margins[1]))
-                diff = (dst.width - img_.width)//2
+                diff = (dst.width - img_.width) // 2
                 loc = (
                     (diff, idx * self.size + args.box_margins[1]),
                     (img_.width + diff, idx * self.size + args.box_margins[1]),
@@ -170,14 +165,15 @@ class CompoundGenerator:
         box_random_angle = self.box_skewing_angle if not self.box_random_skew else box_random_angle
         dst = dst.rotate(box_random_angle, expand=True)
 
-        img_locs = after_rotate(dst.width, dst.height, (dst.width/2, dst.height/2), -box_random_angle, img_locs)
+        img_locs = after_rotate(dst.width, dst.height, (dst.width / 2, dst.height / 2), -box_random_angle, img_locs)
 
-        # draw = ImageDraw.Draw(dst)
-        # for i in img_locs:
-        #     print(i)
-        #     draw.line((i[0], i[1]), fill='black')
-        #     draw.line((i[1], i[2]), fill='black')
-        #     draw.line((i[2], i[3]), fill='black')
-        #     draw.line((i[3], i[0]), fill='black')
+        if args.draw_box:
+            draw = ImageDraw.Draw(dst)
+            for i in img_locs:
+                print(i)
+                draw.line((i[0], i[1]), fill='black')
+                draw.line((i[1], i[2]), fill='black')
+                draw.line((i[2], i[3]), fill='black')
+                draw.line((i[3], i[0]), fill='black')
 
         return dst, img_locs
